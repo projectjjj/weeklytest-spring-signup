@@ -51,6 +51,17 @@
             getArticles();
         });
 
+        $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+            if (localStorage.getItem('token')) {
+                jqXHR.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+            }
+        });
+        function logout() {
+            localStorage.removeItem("token");
+            localStorage.removeItem("userid");
+            location.href = '/';
+        }
+
         function openClose() {
             if ($("#post-box").css("display") == "block") {
                 $("#post-box").hide();
@@ -110,12 +121,51 @@
             let tempHtml = ` <tr>
                       <th scope="row">${index}</th>
                       <td><a href="view.html?idx=${article['idx']}">${article['title']}</td>
+                      <td>작성자</td>
                       <td>${article['comments'].length}</td>
                       <td>${tags}</td>
                       <td>${article['createdAt']}</td>
                       </tr>
                     `;
             $("#list-post").append(tempHtml);
+        }
+        function signup() {
+            let info = {
+                userid: $("#userid").val(),
+                password: $("#password").val()
+            }
+            $.ajax({
+                type: 'POST',
+                url: `/signup`,
+                contentType: "application/json",
+                data: JSON.stringify(info),
+                success: function (response) {
+                    alert("회원가입이 완료되었습니다!!");
+                    location.href = '/';
+                }
+            })
+        }
+        function login() {
+            let info = {
+                userid: $("#loginUserid").val(),
+                password: $("#loginPassword").val()
+            }
+            $.ajax({
+                type: 'POST',
+                url: `/login`,
+                contentType: "application/json",
+                data: JSON.stringify(info),
+                success: function (response) {
+                    localStorage.setItem("token", response['token']);
+                    localStorage.setItem("userid", response['userid']);
+                    location.href = '/';
+                },
+                error : function (request) {
+                    if(request.status === 401) {
+                        alert("등록된 아이디가 없거나 비밀번호를 다시 확인해주세요.")
+                    }
+                }
+            })
         }
     </script>
 </head>
@@ -126,6 +176,17 @@
         <hr class="my-4">
         <p class="lead">
             <button onclick="openClose()" id="btn-post-box" type="button" class="btn btn-primary">포스팅 박스 열기</button>
+        <div class="mb-3">회원가입
+        <input type="text" class="form-control" id="userid" placeholder="ID">
+        <input type="password" class="form-control" id="password" placeholder="비밀번호">
+        <button type="button" class="btn btn-primary" onclick="signup()">회원가입</button>
+        </div>
+        <div class="mb-3">로그인
+            <input type="text" class="form-control" id="loginUserid" placeholder="ID">
+            <input type="password" class="form-control" id="loginPassword" placeholder="비밀번호">
+            <button type="button" class="btn btn-primary" onclick="login()">로그인</button>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="logout()">로그아웃</button>
         </p>
     </div>
     <div id="post-box" class="form-post" style="display:none">
@@ -150,6 +211,7 @@
         <tr>
             <th scope="col">#</th>
             <th scope="col">제목</th>
+            <th scope="col">작성자</th>
             <th scope="col">댓글수</th>
             <th scope="col">태그</th>
             <th scope="col">등록일자</th>
@@ -165,6 +227,41 @@
         </div>
     </div>
 </div>
-
+<!--회원가입 모달-->
+<!--<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">-->
+<!--    <div class="modal-dialog">-->
+<!--        <div class="modal-content">-->
+<!--            <div class="modal-header">-->
+<!--                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>-->
+<!--                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+<!--            </div>-->
+<!--            <div class="modal-body">-->
+<!--                ...-->
+<!--            </div>-->
+<!--            <div class="modal-footer">-->
+<!--                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
+<!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--로그인 모달-->
+<!--<div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">-->
+<!--    <div class="modal-dialog">-->
+<!--        <div class="modal-content">-->
+<!--            <div class="modal-header">-->
+<!--                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>-->
+<!--                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+<!--            </div>-->
+<!--            <div class="modal-body">-->
+<!--                ...-->
+<!--            </div>-->
+<!--            <div class="modal-footer">-->
+<!--                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
+<!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 </body>
 </html>

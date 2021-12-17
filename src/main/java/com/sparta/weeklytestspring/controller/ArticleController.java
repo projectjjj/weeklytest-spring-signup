@@ -3,8 +3,10 @@ package com.sparta.weeklytestspring.controller;
 import com.sparta.weeklytestspring.domain.Article;
 import com.sparta.weeklytestspring.dto.ArticleCommentRequestDto;
 import com.sparta.weeklytestspring.dto.ArticleRequestDto;
+import com.sparta.weeklytestspring.security.UserDetailsImpl;
 import com.sparta.weeklytestspring.service.ArticleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -18,8 +20,8 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @PostMapping("/article")
-    public Article setArticle(ArticleRequestDto articleRequestDto) throws IOException {
-        return articleService.setArticle(articleRequestDto);
+    public Article setArticle(ArticleRequestDto articleRequestDto,@AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        return articleService.setArticle(articleRequestDto,userDetails);
     }
 
     @GetMapping("/articles")
